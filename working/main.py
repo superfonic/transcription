@@ -18,7 +18,8 @@ class _ProcSound:
         fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2)) #formatting the data
         
         #plt.ion
-        ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data 
+        _Plotting.plot(freq,data,1)
+        
         #plt.show(block=False)
 
         # - - - Rework this Section - - -
@@ -47,7 +48,8 @@ class _ProcSound:
             peaks.append(new_peaks) #add the return frequencies to the list
         
         #input('Pause for plotting...')
-        ax2.hist(peaks, bins='auto')
+        _Plotting.plot(peaks,fdata,2)
+        
         return(peaks) #return the list of frequencies
         
                
@@ -63,6 +65,26 @@ class _ProcSound:
         fft_data[position[0]] = 0 #set the max value in the dataset equal to zero
 
         return(peak_freq,fft_data,fft_freq) #returns the frequency, the dataset, and the frequencies
+
+class _Plotting:
+    """sets up and plots the inputs on 3 different plots"""
+    def setup(title):
+        """initializes the plots and sets the title name"""
+        gridsize = (3, 4)
+        fig = plt.figure(figsize=(12, 8))
+        ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=2, rowspan=2)
+        ax2 = plt.subplot2grid(gridsize, (0, 2), colspan=2, rowspan=2)
+        ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=4, rowspan=1)
+        ax1.set_title(title, fontsize = 14)
+
+    def plot(data1, data2, pos):
+        """plots the data provided"""
+        if pos == 1:
+            ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data 
+        if pos == 2:
+            ax2.hist(data1, bins='auto')
+        if pos == 3:
+            ax3.plot(data1)
 
 def get_note(freq):
     """Finds the musical note corresponding to the given frequency"""
@@ -186,25 +208,18 @@ def get_note(freq):
 
     return(note) #return the found note
 
-gridsize = (3, 4)
-fig = plt.figure(figsize=(12, 8))
-ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=2, rowspan=2)
-ax2 = plt.subplot2grid(gridsize, (0, 2), colspan=2, rowspan=2)
-ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=4, rowspan=1)
-
-
 Tk().withdraw() #disable part of the TK gui
 filename = askopenfilename() #ask for the file name of the WAV file
 if filename == "": #if none is selected, quit
     quit(0)
 
-ax1.set_title(filename, fontsize = 14)
-#print(filename) #print the selected file name
+_Plotting.setup(filename)
+
 
 fs, data = wavfile.read(filename) #reads the selected WAV file and returns sampling rate and the sound data
-ax3.plot(data)
+_Plotting.plot(data,data,3)
+
 split = int(int(data.size)/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
-ax3.set_title('Size: ' + str(data.size) + ' Slipt: '+ str(split))
 
 framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
 
