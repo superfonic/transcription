@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
     my_plot.plot(data,data,3)
 
-    split = int(int(data.size)/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
+    split = int(int(len(data))/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
 
     framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
 
