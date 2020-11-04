@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+#
+# main.py
+#
+##############################################################################
+# REQUIRED MODULES
+##############################################################################
 import matplotlib.pyplot as plt
 import numpy as np
 import time
@@ -5,25 +12,43 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from scipy.io import wavfile
 
+
+##############################################################################
+# CLASSES
+##############################################################################
 class _ProcSound:
     """takes the input numpy file and performs the Fourier Transform analysis to then finds all of the frequencies corresponding to the peaks in the transform"""
-           
-    def find_all_peaks(sound_data, sample_rate):  
-        """returns all of the peaks of the Fourier Transform"""
+    def __init__():
+        """
+        Name:     _ProcSound.__init__
+        Inputs:   None
+        Outputs:  None
+        Features: Basic intialization
+        """
+        pass
+
+    def find_all_peaks(self, sound_data, sample_rate):
+        """
+        Name:     _ProcSound.find_all_peaks
+        Inputs:   - array, audio data (sound_data)
+                  - float, sampling rate of audio file (sample_rate)
+        Outputs:  - list, list of frequencies
+        Features: returns all of the peaks of the Fourier Transform
+        """
         N = int(sound_data.size) #finds the size of the sample data
         dur = int((N/1)) #calculate the time duration of the sample data
         freq = abs(np.fft.fftfreq(dur, 1/sample_rate)) #calculate the sample frequencies for the specific time duration
 
         ft = np.fft.fft(sound_data[:]) #perform a Fourier Transform of the sample data
         fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2)) #formatting the data
-        
+
         #plt.ion
         _Plotting.plot(freq,data,1)
-        
+
         #plt.show(block=False)
 
         # - - - Rework this Section - - -
-        
+
         #This section of the logic is working with the data to eliminate noise and increase the accuracy of the output
         #fsub = np.roll(fdata, -1)  #shift the data by 1 position
         fdata = fdata-(np.mean(fdata)*10) #subtracting the mean of the entire data from the individual values
@@ -36,7 +61,7 @@ class _ProcSound:
         #input('Pause for plotting...')
         #time.sleep(5)
 
-        # - - - End of Rework Section - - - 
+        # - - - End of Rework Section - - -
 
         peaks = [] #list of frequencies of the peaks
         (new_peaks, fdata, freq) = _ProcSound.find_peak(fdata, freq) #find_peak finds the largest peak in the data set then is sent to it and will return the corresponding frequency and the data set with that value set to 0
@@ -46,17 +71,27 @@ class _ProcSound:
 
             (new_peaks, fdata, freq) = _ProcSound.find_peak(fdata, freq) #loop through the dataset until all peaks are found
             peaks.append(new_peaks) #add the return frequencies to the list
-        
+
         #input('Pause for plotting...')
         _Plotting.plot(peaks,fdata,2)
-        
+
         return(peaks) #return the list of frequencies
-        
-               
-    def find_peak(fft_data, fft_freq):
-        """ finds the maximum value of the given dataset, relates that to it's corresponding frequency, and removes that value from the dataset 
-        Returned are the found frequency, the altered data set, and the dataset containing the frequencies"""
-        
+
+
+    def find_peak(self, fft_data, fft_freq):
+        """
+        Names:    _ProcSound.find_peak
+        Inputs:   - (fft_data)
+                  - (fft_freq)
+        Outputs:  tuple of values
+                  - float, peak frequency
+                  - list, original data (edited)
+                  - float, original frequency
+        Features: finds the maximum value of the given dataset,
+                  relates that to it's corresponding frequency,
+                  and removes that value from the dataset.
+                  Returned are the found frequency, the altered data set, and the dataset containing the frequencies
+        """
         note = np.max(fft_data) #find the maximum value in the dataset
         nposition = np.where(fft_data == note) #find it's position in the dataset
         nposition = list(nposition) #converts the location to a list
@@ -66,9 +101,14 @@ class _ProcSound:
 
         return(peak_freq,fft_data,fft_freq) #returns the frequency, the dataset, and the frequencies
 
+
 class _Plotting:
     """sets up and plots the inputs on 3 different plots"""
-    def setup(title):
+    def __init__(self):
+        """TBA"""
+        pass
+
+    def setup(self, title):
         """initializes the plots and sets the title name"""
         gridsize = (3, 4)
         fig = plt.figure(figsize=(12, 8))
@@ -77,20 +117,25 @@ class _Plotting:
         ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=4, rowspan=1)
         ax1.set_title(title, fontsize = 14)
 
-    def plot(data1, data2, pos):
+    def plot(self, data1, data2, pos):
         """plots the data provided"""
         if pos == 1:
-            ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data 
+            ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data
         if pos == 2:
             ax2.hist(data1, bins='auto')
         if pos == 3:
             ax3.plot(data1)
 
+
+
+##############################################################################
+# FUNCTIONS
+##############################################################################
 def get_note(freq):
     """Finds the musical note corresponding to the given frequency"""
     freq.sort() #sorts the frequencies in ascending order
     freq = list(dict.fromkeys(freq)) #removes all duplicates from the list
-    
+
     if len(freq) > 1: #list size is greater than 1
         if freq[0]<12: #first value in the list is less than 12
             freq=freq[1:] #if there are more than 1 member in the list and the first value is less than 12 eliminate it
@@ -208,6 +253,10 @@ def get_note(freq):
 
     return(note) #return the found note
 
+
+##############################################################################
+# MAIN
+##############################################################################
 Tk().withdraw() #disable part of the TK gui
 filename = askopenfilename() #ask for the file name of the WAV file
 if filename == "": #if none is selected, quit
@@ -238,5 +287,3 @@ print(note) #print the result
 
 plt.show(block=False)
 input('Press Enter to continue....')
-
-
