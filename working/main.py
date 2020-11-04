@@ -365,3 +365,4 @@ if __name__ == "__main__":
 
     plt.show(block=False)
     input('Press Enter to continue....')
+    plt.close()
