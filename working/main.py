@@ -2,6 +2,14 @@
 #
 # main.py
 #
+# VERSION 0.0.1
+#
+#
+# LEXICON
+# -------
+# wavefile: full audio frequency data set
+# frame: subset of the wavefile
+#
 ##############################################################################
 # REQUIRED MODULES
 ##############################################################################
@@ -62,7 +70,7 @@ class _ProcSound:
         fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2)) #formatting the data
 
         #plt.ion
-        sample_plot.plot(freq,data,1)
+        sample_plot.plot(freq,fdata,1)
 
         #plt.show(block=False)
 
@@ -158,7 +166,7 @@ class _Plotting:
         Features: plots the data provided
         """
         if pos == 1:
-            self.ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data
+            self.ax1.plot(data1, data2) #Optional Data Plot to show the Fourier Transform of the data
         elif pos == 2:
             self.ax2.hist(data1, bins='auto')
         elif pos == 3:
@@ -321,8 +329,18 @@ if __name__ == "__main__":
     my_plot = _Plotting()
     my_plot.setup(filename)
 
-    # reads the selected WAV file and returns sampling rate and the sound data
+    # reads the selected WAV file and returns
+    # sampling rate (int) and the sound data (numpy.array)
     fs, data = wavfile.read(filename)
+
+    # TODO: deal with mono/stereo
+    # e.g., G.wav --- left only or average channels or else?
+    if len(data.shape) > 1:
+        print("Input file has {} channels".format(data.shape[1]))
+        # For now, just take one channel
+        data = data[:, 0]
+    else:
+        print("Input file has {} channels".format(1))
 
     my_plot.plot(data,data,3)
 
