@@ -5,11 +5,22 @@
 ##############################################################################
 # REQUIRED MODULES
 ##############################################################################
-import matplotlib.pyplot as plt
+import argparse
+import os
+
+import matplotlib
+gui_env = ['TKAgg','GTKAgg','Qt4Agg','WXAgg']
+for gui in gui_env:
+    try:
+        print("testing {}".format(gui))
+        matplotlib.use(gui,warn=False, force=True)
+        from matplotlib import pyplot as plt
+        break
+    except:
+        continue
+print("Using: {}".format(matplotlib.get_backend()))
+
 import numpy as np
-import time
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
 from scipy.io import wavfile
 
 
@@ -18,7 +29,10 @@ from scipy.io import wavfile
 ##############################################################################
 class _ProcSound:
     """takes the input numpy file and performs the Fourier Transform analysis to then finds all of the frequencies corresponding to the peaks in the transform"""
-    def __init__():
+    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    # Class Initialization
+    # ////////////////////////////////////////////////////////////////////////
+    def __init__(self):
         """
         Name:     _ProcSound.__init__
         Inputs:   None
@@ -27,13 +41,18 @@ class _ProcSound:
         """
         pass
 
-    def find_all_peaks(self, sound_data, sample_rate):
+    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    # Class Function Definitions
+    # ////////////////////////////////////////////////////////////////////////
+    def find_all_peaks(self, sample_plot, sound_data, sample_rate):
         """
         Name:     _ProcSound.find_all_peaks
-        Inputs:   - array, audio data (sound_data)
+        Inputs:   - _Plotting, this our plotter (sample_plot)
+                  - array, audio data (sound_data)
                   - float, sampling rate of audio file (sample_rate)
         Outputs:  - list, list of frequencies
-        Features: returns all of the peaks of the Fourier Transform
+        Features: Returns all of the peaks of the Fourier Transform
+        Depends:  - find_peak
         """
         N = int(sound_data.size) #finds the size of the sample data
         dur = int((N/1)) #calculate the time duration of the sample data
@@ -43,7 +62,7 @@ class _ProcSound:
         fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2)) #formatting the data
 
         #plt.ion
-        _Plotting.plot(freq,data,1)
+        sample_plot.plot(freq,data,1)
 
         #plt.show(block=False)
 
@@ -64,16 +83,16 @@ class _ProcSound:
         # - - - End of Rework Section - - -
 
         peaks = [] #list of frequencies of the peaks
-        (new_peaks, fdata, freq) = _ProcSound.find_peak(fdata, freq) #find_peak finds the largest peak in the data set then is sent to it and will return the corresponding frequency and the data set with that value set to 0
+        (new_peaks, fdata, freq) = self.find_peak(fdata, freq) #find_peak finds the largest peak in the data set then is sent to it and will return the corresponding frequency and the data set with that value set to 0
         peaks.append(new_peaks) #add the frequency to the list of peaks
 
         while np.max(fdata) > 5: #loop while any peak is greater than 5 (5 is just a value selected to be a reasonable height, this might need adjusted for accuracy)
 
-            (new_peaks, fdata, freq) = _ProcSound.find_peak(fdata, freq) #loop through the dataset until all peaks are found
+            (new_peaks, fdata, freq) = self.find_peak(fdata, freq) #loop through the dataset until all peaks are found
             peaks.append(new_peaks) #add the return frequencies to the list
 
         #input('Pause for plotting...')
-        _Plotting.plot(peaks,fdata,2)
+        sample_plot.plot(peaks,fdata,2)
 
         return(peaks) #return the list of frequencies
 
@@ -104,27 +123,48 @@ class _ProcSound:
 
 class _Plotting:
     """sets up and plots the inputs on 3 different plots"""
+    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    # Class Initialization
+    # ////////////////////////////////////////////////////////////////////////
     def __init__(self):
         """TBA"""
-        pass
+        self.gridsize = (3, 4)
 
+    # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    # Class Function Definitions
+    # ////////////////////////////////////////////////////////////////////////
     def setup(self, title):
-        """initializes the plots and sets the title name"""
-        gridsize = (3, 4)
-        fig = plt.figure(figsize=(12, 8))
-        ax1 = plt.subplot2grid(gridsize, (0, 0), colspan=2, rowspan=2)
-        ax2 = plt.subplot2grid(gridsize, (0, 2), colspan=2, rowspan=2)
-        ax3 = plt.subplot2grid(gridsize, (2, 0), colspan=4, rowspan=1)
-        ax1.set_title(title, fontsize = 14)
+        """
+        Name:     _Plotting.setup
+        Input:    str, title of plot
+        Outputs:  None
+        Features: initializes the plots and sets the title name
+        """
+        self.fig = plt.figure(figsize=(12, 8))
+        self.ax1 = plt.subplot2grid(
+            self.gridsize, (0, 0), colspan=2, rowspan=2)
+        self.ax2 = plt.subplot2grid(
+            self.gridsize, (0, 2), colspan=2, rowspan=2)
+        self.ax3 = plt.subplot2grid(
+            self.gridsize, (2, 0), colspan=4, rowspan=1)
+        self.ax1.set_title(title, fontsize = 14)
 
     def plot(self, data1, data2, pos):
-        """plots the data provided"""
+        """
+        Name:     _Plotting.plot
+        Inputs:   - list/array, data to plot (data1)
+                  - list/array, data to plot (data2)
+                  - int, the trend plot you are assigning (pos)
+        Features: plots the data provided
+        """
         if pos == 1:
-            ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data
-        if pos == 2:
-            ax2.hist(data1, bins='auto')
-        if pos == 3:
-            ax3.plot(data1)
+            self.ax1.plot(freq, fdata) #Optional Data Plot to show the Fourier Transform of the data
+        elif pos == 2:
+            self.ax2.hist(data1, bins='auto')
+        elif pos == 3:
+            self.ax3.plot(data1)
+        else:
+            print("You have chosen poorly.")
 
 
 
@@ -132,7 +172,12 @@ class _Plotting:
 # FUNCTIONS
 ##############################################################################
 def get_note(freq):
-    """Finds the musical note corresponding to the given frequency"""
+    """
+    Name:     get_note
+    Input:    array, array of frequencies (freq)
+    Output:   str, the musical note
+    Features: Finds the musical note corresponding to the given frequency
+    """
     freq.sort() #sorts the frequencies in ascending order
     freq = list(dict.fromkeys(freq)) #removes all duplicates from the list
 
@@ -257,33 +302,48 @@ def get_note(freq):
 ##############################################################################
 # MAIN
 ##############################################################################
-Tk().withdraw() #disable part of the TK gui
-filename = askopenfilename() #ask for the file name of the WAV file
-if filename == "": #if none is selected, quit
-    quit(0)
+if __name__ == "__main__":
+    # Create an ArgumentParser class object for dealing with commandline args
+    p = argparse.ArgumentParser(
+        description="Transcribes an audio file to music notes.")
+    p.add_argument("-f", "--file", default="../audio/G.wav",
+        help="Path to your music file")
 
-_Plotting.setup(filename)
+    # Read any commandline arguements sent to the program
+    # NOTE: if -h or --help, the program stops here
+    args = p.parse_args()
+
+    if not os.path.isfile(args.file):
+        filename = input("Enter path to music file: ")
+    else:
+        filename = args.file
+
+    my_plot = _Plotting()
+    my_plot.setup(filename)
+
+    # reads the selected WAV file and returns sampling rate and the sound data
+    fs, data = wavfile.read(filename)
+
+    my_plot.plot(data,data,3)
+
+    split = int(int(data.size)/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
+
+    framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
+
+    #for i in range(split): #loops through all the sound frames
+    #    frame = framed_data.pop(0) #takes the first frame
+    #    note_freq = _ProcSound.find_all_peaks(frame, fs) #gets all of the frequencies in the selected sound frame
+    #    note = get_note(note_freq) #determines the note associated with the frame
+    #    print(str(i) + 'note: ' + str(note)) #print the result
 
 
-fs, data = wavfile.read(filename) #reads the selected WAV file and returns sampling rate and the sound data
-_Plotting.plot(data,data,3)
+    frame = framed_data.pop(30) #takes the first frame
 
-split = int(int(data.size)/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
+    my_proc = _ProcSound()
+    note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
+    print(note_freq)
+    note = get_note(note_freq) #determines the note associated with the frame
+    print(note) #print the result
 
-framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
-
-#for i in range(split): #loops through all the sound frames
-#    frame = framed_data.pop(0) #takes the first frame
-#    note_freq = _ProcSound.find_all_peaks(frame, fs) #gets all of the frequencies in the selected sound frame
-#    note = get_note(note_freq) #determines the note associated with the frame
-#    print(str(i) + 'note: ' + str(note)) #print the result
-
-frame = framed_data.pop(30) #takes the first frame
-note_freq = _ProcSound.find_all_peaks(frame, fs) #gets all of the frequencies in the selected sound frame
-print(note_freq)
-note = get_note(note_freq) #determines the note associated with the frame
-print(note) #print the result
-
-
-plt.show(block=False)
-input('Press Enter to continue....')
+    plt.show(block=False)
+    input('Press Enter to continue....')
