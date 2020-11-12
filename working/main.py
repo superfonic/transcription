@@ -9,6 +9,8 @@
 # -------
 # wavefile: full audio frequency data set
 # frame: subset of the wavefile
+# sample: the smallest subset of a audio file's data; read from audio file
+# sample rate: number of samples per second (Hz); read from the audio file
 #
 ##############################################################################
 # REQUIRED MODULES
