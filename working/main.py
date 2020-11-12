@@ -64,20 +64,20 @@ if __name__ == "__main__":
 
     framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
 
-    #for i in range(split): #loops through all the sound frames
-    #    frame = framed_data.pop(0) #takes the first frame
-    #    note_freq = ProcSound.find_all_peaks(frame, fs) #gets all of the frequencies in the selected sound frame
-    #    note = get_note(note_freq) #determines the note associated with the frame
-    #    print(str(i) + 'note: ' + str(note)) #print the result
-
-
-    frame = framed_data.pop(30) #takes the first frame
-
     my_proc = ProcSound()
-    note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
-    print(note_freq)
-    note = get_note(note_freq) #determines the note associated with the frame
-    print(note) #print the result
+    for i in range(split): #loops through all the sound frames
+        frame = framed_data.pop(0) #takes the first frame
+        note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
+        note = get_note(note_freq) #determines the note associated with the frame
+        print(str(i) + 'note: ' + str(note)) #print the result
+
+
+    #frame = framed_data.pop(30) #takes the first frame
+    #my_proc = ProcSound()
+    #note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
+    #print(note_freq)
+    #note = get_note(note_freq) #determines the note associated with the frame
+    #print(note) #print the result
 
     my_plot.show()
     input('Press Enter to continue....')
