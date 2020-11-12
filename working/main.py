@@ -27,9 +27,10 @@ from scipy.io import wavfile
 ##############################################################################
 if __name__ == "__main__":
     # Create an ArgumentParser class object for dealing with commandline args
+    print(os.getcwd())
     p = argparse.ArgumentParser(
         description="Transcribes an audio file to music notes.")
-    p.add_argument("-f", "--file", default= r"C:\Users\tim.muckian\source\repos\superfonic\transcription\audio\piano-G5.wav",
+    p.add_argument("-f", "--file", default= "../audio/piano-G5.wav",
         help="Path to your music file")
 
     # Read any commandline arguements sent to the program
