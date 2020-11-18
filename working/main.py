@@ -2,7 +2,7 @@
 #
 # main.py
 #
-# VERSION 0.0.1
+# VERSION 0.0.2
 #
 #
 # LEXICON
@@ -16,13 +16,14 @@
 # REQUIRED MODULES
 ##############################################################################
 import argparse
+import copy
 import os
+
+from superf.NoteMaster import NoteMaster
 from superf.ProcSound import ProcSound
 from superf.Plotting import Plotting
 from superf.utilities import get_note
 
-import numpy as np
-from scipy.io import wavfile
 
 ##############################################################################
 # MAIN
@@ -44,32 +45,28 @@ if __name__ == "__main__":
     else:
         filename = args.file
 
+    # Initialze plotting class
     my_plot = Plotting()
     my_plot.setup(filename)
 
-    # reads the selected WAV file and returns
-    # sampling rate (int) and the sound data (numpy.array)
-    fs, data = wavfile.read(filename)
+    # Initialize notemaster class
+    my_note = NoteMaster()
 
-    # TODO: deal with mono/stereo
-    # e.g., G.wav --- left only or average channels or else?
-    if len(data.shape) > 1:
-        print("Input file has {} channels".format(data.shape[1]))
-        # For now, just take one channel
-        data = data[:, 0]
-    else:
-        print("Input file has {} channels".format(1))
+    # Read audio file and split the data into frames
+    my_note.read_audio(filename)
+    my_note.split_frames()
 
-    my_plot.plot(data,data,3)
+    # Set the bottom plot in plotting:
+    my_plot.plot(my_note.data, None, 3)
 
-    split = int(int(len(data))/(fs/48)) #calculate how large of a sample window to process, 48 is based on a 16th note at 180 beats per minute
+    # Get a working copy of framed data
+    framed_data = copy.deepcopy(my_note.framed_data)
 
-    framed_data = np.array_split(data,split,0) #splits the sound data into smaller frames
-
+    # Intialize proc sound class and iterate over frames
     my_proc = ProcSound()
-    for i in range(split): #loops through all the sound frames
+    for i in range(my_note.num_frames): #loops through all the sound frames
         frame = framed_data.pop(0) #takes the first frame
-        note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
+        note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
         print(str(i) + 'note: ' + str(note)) #print the result
 
