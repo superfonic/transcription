@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     # Initialze plotting class
     my_plot = Plotting()
-    my_plot.setup(filename)
+    my_plot.setup(os.path.basename(filename))
 
     # Initialize notemaster class
     my_note = NoteMaster()
@@ -64,20 +64,15 @@ if __name__ == "__main__":
 
     # Intialize proc sound class and iterate over frames
     my_proc = ProcSound()
+    my_plot.show()
     for i in range(my_note.num_frames): #loops through all the sound frames
         frame = framed_data.pop(0) #takes the first frame
         note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
         print(str(i) + 'note: ' + str(note)) #print the result
+        # Update plotting cavas
+        my_plot.patch(i, my_note.height, my_note.ymin, frame)
+        my_plot.fig.canvas.draw()
 
-
-    #frame = framed_data.pop(30) #takes the first frame
-    #my_proc = ProcSound()
-    #note_freq = my_proc.find_all_peaks(my_plot, frame, fs) #gets all of the frequencies in the selected sound frame
-    #print(note_freq)
-    #note = get_note(note_freq) #determines the note associated with the frame
-    #print(note) #print the result
-
-    my_plot.show()
     input('Press Enter to continue....')
     my_plot.close()

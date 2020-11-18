@@ -55,6 +55,10 @@ class NoteMaster(object):
         return self.sample_data
 
     @property
+    def height(self):
+        return int(float(self.ymax) - float(self.ymin))
+
+    @property
     def fs(self):
         return self.sample_rate
 
@@ -65,6 +69,14 @@ class NoteMaster(object):
     @property
     def split(self):
         return self.num_frames
+
+    @property
+    def ymax(self):
+        return numpy.max(self.sample_data)
+
+    @property
+    def ymin(self):
+        return numpy.min(self.sample_data)
 
     # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     # Class Function Definitions
