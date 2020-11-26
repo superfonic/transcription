@@ -30,6 +30,7 @@ class NoteMaster(object):
     # ////////////////////////////////////////////////////////////////////////
     sample_data = []  # read from audio file
     framed_data = []  # manually split
+    frame_samples = 0 # number of samples per frame
     num_frames = 0    # manually set
     sample_rate = 0   # sampling rate read from audio file (Hz)
     frame_size = 0    # calculated based on  number of frames / samples
@@ -65,6 +66,10 @@ class NoteMaster(object):
     @property
     def num_samples(self):
         return len(self.sample_data)
+
+    @property
+    def frame_size(self):
+        return self.frame_samples
 
     @property
     def split(self):
@@ -114,11 +119,12 @@ class NoteMaster(object):
 
     def split_frames(self):
         """
-        Calculates how large of a sample window to process;
-        48 is based on a 16th note at 180 beats per minute.
-        Saves the data into split frames.
+        Calculates the number of frames in the 
+        wave file based on a set number of samples per frame
+
         """
-        self.num_frames = int(int(len(self.sample_data))/(self.sample_rate/48))
+        self.frame_samples = 200
+        self.num_frames = int(int(len(self.sample_data))/self.frame_size)
         self.framed_data = numpy.array_split(
             self.sample_data, self.num_frames, 0
         )
