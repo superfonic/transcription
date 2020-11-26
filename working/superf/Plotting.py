@@ -16,7 +16,7 @@ gui_env = ['TKAgg','GTKAgg','Qt4Agg','WXAgg']
 for gui in gui_env:
     try:
         print("testing {}".format(gui))
-        matplotlib.use(gui,warn=False, force=True)
+        matplotlib.use(gui, force=True)
         from matplotlib import pyplot as plt
         break
     except:
