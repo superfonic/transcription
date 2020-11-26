@@ -30,7 +30,7 @@ from superf.utilities import get_note
 ##############################################################################
 
 disable_plot = True        #  turns off all plots
-disable_processing = True  #  turns off the repeat processing, only processes one
+disable_processing = False  #  turns off the repeat processing, only processes one
 
 ##############################################################################
 # MAIN

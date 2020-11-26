@@ -60,13 +60,14 @@ class OutClass(object):
                 "framesize": self.framesize
             },
             "data": [
-                {
-                    "index": 0,
-                    "peaks": [],
-                    "note": "Am"
-                }
+                    {
+                        "index": 0,
+                        "peaks": self.data[0],
+                        "note": get_note(self.data[0])
+                    }
             ]
         }
+        #js_obj = json.dumps(self.data, indent = 2)
         js_obj = json.dumps(self.json, indent = 2)
         print(js_obj)
 
