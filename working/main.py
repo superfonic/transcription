@@ -20,6 +20,7 @@ import copy
 import os
 
 from superf.NoteMaster import NoteMaster
+from superf.OutClass import OutClass
 from superf.ProcSound import ProcSound
 from superf.Plotting import Plotting
 from superf.utilities import get_note
@@ -41,20 +42,25 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if not os.path.isfile(args.file):
-        filename = input("Enter path to music file: ")
+        file_path = input("Enter path to music file: ")
     else:
-        filename = args.file
+        file_path = args.file
+
+    # Read the file name from input file path
+    file_name = os.path.basename(file_path)
 
     # Initialze plotting class
     my_plot = Plotting()
-    my_plot.setup(os.path.basename(filename))
+    my_plot.setup(file_name)
 
-    # Initialize notemaster class
+    # Initialize notemaster and output data class
     my_note = NoteMaster()
+    my_out = OutClass(file_name)
 
-    # Read audio file and split the data into frames
-    my_note.read_audio(filename)
+    # Read audio file, split the data into frames, and setup output vals
+    my_note.read_audio(file_path)
     my_note.split_frames()
+    my_out.setup_with_note(my_note)
 
     # Set the bottom plot in plotting:
     my_plot.plot(my_note.data, None, 3)
@@ -69,10 +75,12 @@ if __name__ == "__main__":
         frame = framed_data.pop(0) #takes the first frame
         note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
-        print(str(i) + 'note: ' + str(note)) #print the result
+        my_out.add_peaks(i, note_freq)
+        #print(str(i) + 'note: ' + str(note)) #print the result
         # Update plotting cavas
         my_plot.patch(i, my_note.height, my_note.ymin, frame)
         my_plot.fig.canvas.draw()
 
     input('Press Enter to continue....')
     my_plot.close()
+    my_out.print_json()
