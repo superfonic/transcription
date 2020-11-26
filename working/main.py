@@ -25,6 +25,12 @@ from superf.ProcSound import ProcSound
 from superf.Plotting import Plotting
 from superf.utilities import get_note
 
+##############################################################################
+# SETTINGS
+##############################################################################
+
+disable_plot = True        #  turns off all plots
+disable_processing = True  #  turns off the repeat processing, only processes one
 
 ##############################################################################
 # MAIN
@@ -63,23 +69,36 @@ if __name__ == "__main__":
     my_out.setup_with_note(my_note)
 
     # Set the bottom plot in plotting:
-    my_plot.plot(my_note.data, None, 3)
+    if not disable_plot:
+        my_plot.plot(my_note.data, None, 3)
 
     # Get a working copy of framed data
     framed_data = copy.deepcopy(my_note.framed_data)
 
     # Intialize proc sound class and iterate over frames
     my_proc = ProcSound()
-    my_plot.show()
-    for i in range(my_note.num_frames): #loops through all the sound frames
-        frame = framed_data.pop(0) #takes the first frame
+    if not disable_plot:
+        my_plot.show()
+
+    if disable_processing:
+        frame = framed_data[30] #takes the 30th frame
         note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
-        my_out.add_peaks(i, note_freq)
-        #print(str(i) + 'note: ' + str(note)) #print the result
-        # Update plotting cavas
-        my_plot.patch(i, my_note.height, my_note.ymin, frame)
-        my_plot.fig.canvas.draw()
+        my_out.add_peaks(0, note_freq)
+        if not disable_plot:
+                my_plot.patch(0, my_note.height, my_note.ymin, frame)
+                my_plot.fig.canvas.draw()
+    else:
+        for i in range(my_note.num_frames): #loops through all the sound frames
+            frame = framed_data.pop(0) #takes the first frame
+            note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
+            note = get_note(note_freq) #determines the note associated with the frame
+            my_out.add_peaks(i, note_freq)
+            #print(str(i) + 'note: ' + str(note)) #print the result
+            # Update plotting cavas
+            if not disable_plot:
+                my_plot.patch(i, my_note.height, my_note.ymin, frame)
+                my_plot.fig.canvas.draw()
 
     input('Press Enter to continue....')
     my_plot.close()

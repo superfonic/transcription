@@ -48,7 +48,7 @@ class ProcSound:
         #print(fdata)
 
         #plt.ion
-        #ax2.plot(freq, fdata)
+        #ax2.plot(freq, fdata) 
         #plt.show(block=False)
         #input('Pause for plotting...')
         #time.sleep(5)
