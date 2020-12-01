@@ -27,17 +27,24 @@ class ProcSound:
         Features: Returns all of the peaks of the Fourier Transform
         Depends:  - find_peak
         """
-        N = int(sound_data.size) #finds the size of the sample data
-        dur = int((N/1)) #calculate the time duration of the sample data
-        freq = abs(np.fft.fftfreq(dur, 1/sample_rate)) #calculate the sample frequencies for the specific time duration
+        # Check if plotting is enabled
+        to_plot = True
+        if sample_plot is None:
+            to_plot = False
 
-        ft = np.fft.fft(sound_data[:]) #perform a Fourier Transform of the sample data
-        fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2)) #formatting the data
+        # Find the size (N), duration and frequency of the sample data
+        N = int(sound_data.size)
+        dur = int((N/1))
+        freq = abs(np.fft.fftfreq(dur, 1/sample_rate))
 
-        #plt.ion
-        sample_plot.plot(freq,fdata,1)
+        # Perform a Fourier Transform of the sample and format the data
+        ft = np.fft.fft(sound_data[:])
+        fdata = abs(np.around(ft.real**2 + ft.imag**2,decimals = 2))
 
-        #plt.show(block=False)
+        if to_plot:
+            #plt.ion
+            sample_plot.plot(freq,fdata,1)
+            #plt.show(block=False)
 
         # - - - Rework this Section - - -
 
@@ -48,7 +55,7 @@ class ProcSound:
         #print(fdata)
 
         #plt.ion
-        #ax2.plot(freq, fdata) 
+        #ax2.plot(freq, fdata)
         #plt.show(block=False)
         #input('Pause for plotting...')
         #time.sleep(5)
@@ -64,8 +71,9 @@ class ProcSound:
             (new_peaks, fdata, freq) = self.find_peak(fdata, freq) #loop through the dataset until all peaks are found
             peaks.append(new_peaks) #add the return frequencies to the list
 
-        #input('Pause for plotting...')
-        sample_plot.plot(peaks,fdata,2)
+        if to_plot:
+            #input('Pause for plotting...')
+            sample_plot.plot(peaks,fdata,2)
 
         return(peaks) #return the list of frequencies
 

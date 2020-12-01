@@ -2,7 +2,7 @@
 #
 # main.py
 #
-# VERSION 0.0.2
+# VERSION 0.0.3
 #
 #
 # LEXICON
@@ -11,6 +11,13 @@
 # frame: subset of the wavefile
 # sample: the smallest subset of a audio file's data; read from audio file
 # sample rate: number of samples per second (Hz); read from the audio file
+#
+# CHANGELOG
+# ---------
+# 2020-11-30    Update & add global parameters [TWD]
+#               Fix DISABLE PLOT in find peaks [TWD]
+#               Add data logging [TWD]
+# 2020-11-26    Add options to disable plotting & processing [TBM]
 #
 ##############################################################################
 # REQUIRED MODULES
@@ -25,12 +32,16 @@ from superf.ProcSound import ProcSound
 from superf.Plotting import Plotting
 from superf.utilities import get_note
 
-##############################################################################
-# SETTINGS
-##############################################################################
 
-disable_plot = True        #  turns off all plots
-disable_processing = False  #  turns off the repeat processing, only processes one
+##############################################################################
+# GLOBAL VARIABLES
+##############################################################################
+DISABLE_PLOT = True  # turns off all plots
+DISABLE_PROC = False  # turns off the repeat processing, only processes one
+FRAME_INDEX = 30      # the frame index to process when processing is false
+TO_LOG = True         # true will save time-stamped JSON log file
+VERBOSE = False       # true will print JSON to console
+
 
 ##############################################################################
 # MAIN
@@ -56,8 +67,10 @@ if __name__ == "__main__":
     file_name = os.path.basename(file_path)
 
     # Initialze plotting class
-    my_plot = Plotting()
-    my_plot.setup(file_name)
+    my_plot = None
+    if not DISABLE_PLOT:
+        my_plot = Plotting()
+        my_plot.setup(file_name)
 
     # Initialize notemaster and output data class
     my_note = NoteMaster()
@@ -69,7 +82,7 @@ if __name__ == "__main__":
     my_out.setup_with_note(my_note)
 
     # Set the bottom plot in plotting:
-    if not disable_plot:
+    if not DISABLE_PLOT:
         my_plot.plot(my_note.data, None, 3)
 
     # Get a working copy of framed data
@@ -77,17 +90,17 @@ if __name__ == "__main__":
 
     # Intialize proc sound class and iterate over frames
     my_proc = ProcSound()
-    if not disable_plot:
+    if not DISABLE_PLOT:
         my_plot.show()
 
-    if disable_processing:
-        frame = framed_data[30] #takes the 30th frame
+    if DISABLE_PROC:
+        frame = framed_data[FRAME_INDEX] #takes the 30th frame
         note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
-        my_out.add_peaks(0, note_freq)
-        if not disable_plot:
-                my_plot.patch(0, my_note.height, my_note.ymin, frame)
-                my_plot.fig.canvas.draw()
+        my_out.add_peaks(FRAME_INDEX, note_freq)
+        if not DISABLE_PLOT:
+            my_plot.patch(FRAME_INDEX, my_note.height, my_note.ymin, frame)
+            my_plot.fig.canvas.draw()
     else:
         for i in range(my_note.num_frames): #loops through all the sound frames
             frame = framed_data.pop(0) #takes the first frame
@@ -96,10 +109,14 @@ if __name__ == "__main__":
             my_out.add_peaks(i, note_freq)
             #print(str(i) + 'note: ' + str(note)) #print the result
             # Update plotting cavas
-            if not disable_plot:
+            if not DISABLE_PLOT:
                 my_plot.patch(i, my_note.height, my_note.ymin, frame)
                 my_plot.fig.canvas.draw()
 
-    input('Press Enter to continue....')
-    my_plot.close()
-    my_out.print_json()
+    if not DISABLE_PLOT:
+        input('Press Enter to continue....')
+        my_plot.close()
+    if VERBOSE:
+        my_out.print_json()
+    if TO_LOG:
+        my_out.save_to_json()
