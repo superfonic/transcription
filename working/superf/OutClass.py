@@ -127,7 +127,6 @@ class OutClass(object):
         Inputs:   NoteMaster
         Outputs:  None
         Features: Sets class values using the NoteMaster class
-        TODO:     _ update with Tim's framesize in NoteMaster
         """
         self.samplerate = note_class.sample_rate
         self.framecount = note_class.num_frames

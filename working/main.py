@@ -36,8 +36,8 @@ from superf.utilities import get_note
 ##############################################################################
 # GLOBAL VARIABLES
 ##############################################################################
-DISABLE_PLOT = True  # turns off all plots
-DISABLE_PROC = False  # turns off the repeat processing, only processes one
+DISABLE_PLOT = False  # turns off all plots
+DISABLE_PROC = True  # turns off the repeat processing, only processes one
 FRAME_INDEX = 30      # the frame index to process when processing is false
 TO_LOG = True         # true will save time-stamped JSON log file
 VERBOSE = False       # true will print JSON to console
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     # Set the bottom plot in plotting:
     if not DISABLE_PLOT:
-        my_plot.plot(my_note.data, None, 3)
+        my_plot.plot(my_note.sample_data, None, 3)
 
     # Get a working copy of framed data
     framed_data = copy.deepcopy(my_note.framed_data)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     if DISABLE_PROC:
         frame = framed_data[FRAME_INDEX] #takes the 30th frame
-        note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
+        note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.sample_rate) #gets all of the frequencies in the selected sound frame
         note = get_note(note_freq) #determines the note associated with the frame
         my_out.add_peaks(FRAME_INDEX, note_freq)
         if not DISABLE_PLOT:
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     else:
         for i in range(my_note.num_frames): #loops through all the sound frames
             frame = framed_data.pop(0) #takes the first frame
-            note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.fs) #gets all of the frequencies in the selected sound frame
+            note_freq = my_proc.find_all_peaks(my_plot, frame, my_note.sample_rate) #gets all of the frequencies in the selected sound frame
             note = get_note(note_freq) #determines the note associated with the frame
             my_out.add_peaks(i, note_freq)
             #print(str(i) + 'note: ' + str(note)) #print the result

@@ -30,12 +30,9 @@ class NoteMaster(object):
     # ////////////////////////////////////////////////////////////////////////
     sample_data = []  # read from audio file
     framed_data = []  # manually split
-    frame_samples = 0 # number of samples per frame
     num_frames = 0    # manually set
     sample_rate = 0   # sampling rate read from audio file (Hz)
-    frame_size = 0    # calculated based on  number of frames / samples
-    frame = []        # holds indexes for each frame
-    notes = []        # holds notes corresponding to each frame
+    frame_size = 0    # calculated based on  number of samples / frame
 
     # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     # Class Initialization
@@ -51,29 +48,14 @@ class NoteMaster(object):
     # \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     # Class Property Definitions
     # ////////////////////////////////////////////////////////////////////////
-    @property
-    def data(self):
-        return self.sample_data
 
     @property
     def height(self):
         return int(float(self.ymax) - float(self.ymin))
 
     @property
-    def fs(self):
-        return self.sample_rate
-
-    @property
     def num_samples(self):
         return len(self.sample_data)
-
-    @property
-    def frame_size(self):
-        return self.frame_samples
-
-    @property
-    def split(self):
-        return self.num_frames
 
     @property
     def ymax(self):
@@ -123,8 +105,8 @@ class NoteMaster(object):
         wave file based on a set number of samples per frame
 
         """
-        self.frame_samples = 200
-        self.num_frames = int(int(len(self.sample_data))/self.frame_size)
+        self.frame_size = 200
+        self.num_frames = int(len(self.sample_data)/self.frame_size)
         self.framed_data = numpy.array_split(
             self.sample_data, self.num_frames, 0
         )
