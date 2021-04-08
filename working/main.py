@@ -37,7 +37,7 @@ from superf.utilities import get_note
 # GLOBAL VARIABLES
 ##############################################################################
 DISABLE_PLOT = False  # turns off all plots
-DISABLE_PROC = True  # turns off the repeat processing, only processes one
+DISABLE_PROC = False  # turns off the repeat processing, only processes one
 FRAME_INDEX = 30      # the frame index to process when processing is false
 TO_LOG = True         # true will save time-stamped JSON log file
 VERBOSE = False       # true will print JSON to console
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     print(os.getcwd())
     p = argparse.ArgumentParser(
         description="Transcribes an audio file to music notes.")
-    p.add_argument("-f", "--file", default= "../audio/piano-G5.wav",
+    p.add_argument("-f", "--file", default= "../audio/fmajscale.wav",
         help="Path to your music file")
 
     # Read any commandline arguements sent to the program

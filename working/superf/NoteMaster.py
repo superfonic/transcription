@@ -105,7 +105,7 @@ class NoteMaster(object):
         wave file based on a set number of samples per frame
 
         """
-        self.frame_size = 200
+        self.frame_size = 1000
         self.num_frames = int(len(self.sample_data)/self.frame_size)
         self.framed_data = numpy.array_split(
             self.sample_data, self.num_frames, 0
